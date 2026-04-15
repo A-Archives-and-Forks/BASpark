@@ -619,7 +619,7 @@ namespace BASpark
             try
             {
                 string arguments = create 
-                    ? $"/create /tn \"{taskName}\" /tr \"\\\"{exePath}\\\" /silent\" /sc onlogon /rl highest /f" 
+                    ? $"/create /tn \"{taskName}\" /tr \"\\\"{exePath}\\\" --autostart\" /sc onlogon /rl highest /f" 
                     : $"/delete /tn \"{taskName}\" /f";
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
