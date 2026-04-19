@@ -78,6 +78,31 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="SegmentBtn" TargetType="RadioButton">
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Name="bg" CornerRadius="6" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="White"/>
+                                <Setter Property="Foreground" Value="#45AFFF"/>
+                                <Setter TargetName="bg" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.1"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -157,7 +182,10 @@
                 <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="参数配置" FontSize="24" FontWeight="Bold" Foreground="#333" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="参数配置" FontSize="24" FontWeight="Bold" Foreground="#333"/>
+                        <TextBlock Text="*修改设置后，请点击右侧 [应用更改] 按钮生效。" FontSize="11" Foreground="#FF6B6B" FontWeight="SemiBold" Margin="0,4,0,0" Opacity="0.9"/>
+                    </StackPanel>
 
                     <Button Grid.Column="1" Content="应用更改" Click="SaveSettings_Click" Width="120" Height="36" Background="#45AFFF" Foreground="White" BorderThickness="0" Cursor="Hand" FontWeight="Bold" FontSize="14">
                         <Button.Resources>
@@ -188,6 +216,16 @@
                             <TextBlock Text="基础设置" FontSize="14" FontWeight="Bold" Foreground="#45AFFF" Margin="0,0,0,12"/>
                             <CheckBox Name="CheckMasterSwitch" Content="启用鼠标点击特效" Style="{StaticResource ToggleSwitch}" FontWeight="SemiBold" Margin="0,0,0,12"/>
                             <CheckBox Name="CheckAlwaysTrailEffectSwitch" Content="启用鼠标常驻拖尾" Style="{StaticResource ToggleSwitch}" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                            <StackPanel Margin="0,0,0,15">
+                                <TextBlock Text="触发按键类型" Foreground="#666" Margin="0,0,0,8" FontSize="12"/>
+                                <Border Background="#F0F2F5" CornerRadius="8" Padding="2" HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton Name="RadioLeftClick" Content="仅左键" GroupName="ClickType" IsChecked="True" Style="{StaticResource SegmentBtn}"/>
+                                        <RadioButton Name="RadioRightClick" Content="仅右键" GroupName="ClickType" Style="{StaticResource SegmentBtn}"/>
+                                        <RadioButton Name="RadioBothClick" Content="左右键" GroupName="ClickType" Style="{StaticResource SegmentBtn}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
                             <CheckBox Name="CheckAutoStart" Content="开机自动启动" Style="{StaticResource ToggleSwitch}" Margin="0,0,0,8" Checked="CheckAutoStart_Changed" Unchecked="CheckAutoStart_Changed"/>
                             <CheckBox Name="CheckStartSilent" Content="静默启动 (最小化到托盘)" Style="{StaticResource ToggleSwitch}" Margin="0,0,0,8"/>
                             <CheckBox Name="CheckRunAsAdmin" Content="以管理员权限运行程序" Style="{StaticResource ToggleSwitch}" Margin="0,0,0,8" Checked="CheckRunAsAdmin_Changed" Unchecked="CheckRunAsAdmin_Changed"/>

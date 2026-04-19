@@ -360,6 +360,11 @@ namespace BASpark
             CheckRunAsAdmin.IsChecked = ConfigManager.RunAsAdmin; 
             CheckTouchscreenMode.IsChecked = ConfigManager.IsTouchscreenMode;
 
+            int mode = ConfigManager.ClickTriggerType;
+            if (mode == 1) RadioRightClick.IsChecked = true;
+            else if (mode == 2) RadioBothClick.IsChecked = true;
+            else RadioLeftClick.IsChecked = true;
+
             Profiles.Clear();
             foreach (var p in ConfigManager.GetProfiles()) Profiles.Add(p);
 
@@ -674,6 +679,10 @@ namespace BASpark
             bool startSilentEnabled = CheckStartSilent.IsChecked ?? false;
             bool runAsAdminEnabled = CheckRunAsAdmin.IsChecked ?? false;
             bool isTouchscreenEnabled = CheckTouchscreenMode?.IsChecked ?? false;
+
+            int clickType = 0;
+            if (RadioRightClick.IsChecked == true) clickType = 1;
+            else if (RadioBothClick.IsChecked == true) clickType = 2;
             
             // 保存配置组
             string activeId = (ComboProfiles.SelectedItem as FilterProfile)?.Id ?? "";
@@ -695,6 +704,7 @@ namespace BASpark
             ConfigManager.Save("EnableEnvironmentFilter", CheckEnvironmentFilter.IsChecked ?? false);
             ConfigManager.Save("HideInFullscreen", CheckHideInFullscreen.IsChecked ?? true);
             ConfigManager.Save("ShowEffectOnDesktop", CheckShowEffectOnDesktop.IsChecked ?? true);
+            ConfigManager.Save("ClickTriggerType", clickType);
 
             App.SetAutoStart(ConfigManager.AutoStart);
             ApplyAutoStartSettings();

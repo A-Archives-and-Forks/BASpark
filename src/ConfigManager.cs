@@ -44,6 +44,7 @@ namespace BASpark
         public static string FilterProfiles { get; set; } = "";
         public static string ActiveProfileId { get; set; } = "";
         public static bool IsTouchscreenMode { get; set; } = false;
+        public static int ClickTriggerType { get; set; } = 0; // 0:左, 1:右, 2:左右
 
         private static List<FilterProfile> _profiles = new List<FilterProfile>();
 
@@ -74,6 +75,7 @@ namespace BASpark
                         HideInFullscreen = Convert.ToBoolean(key.GetValue("HideInFullscreen", true));
                         ShowEffectOnDesktop = Convert.ToBoolean(key.GetValue("ShowEffectOnDesktop", true));
                         IsTouchscreenMode = Convert.ToBoolean(key.GetValue("IsTouchscreenMode", false));
+                        ClickTriggerType = Convert.ToInt32(key.GetValue("ClickTriggerType", 0));
 
                         FilterProfiles = key.GetValue("FilterProfiles", "")?.ToString() ?? "";
                         ActiveProfileId = key.GetValue("ActiveProfileId", "")?.ToString() ?? "";
@@ -218,6 +220,7 @@ namespace BASpark
                 ActiveProfileId = "";
                 _profiles.Clear();
                 IsTouchscreenMode = false;
+                ClickTriggerType = 0;
             }
             catch { }
         }

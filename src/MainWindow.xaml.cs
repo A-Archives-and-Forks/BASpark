@@ -707,8 +707,20 @@ namespace BASpark
             _globalHook.MouseDownExt += (s, e) =>
             {
                 if (!CanRenderEffects()) return;
-                if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
 
+                // 新增：按键过滤逻辑
+                int mode = ConfigManager.ClickTriggerType;
+                bool isLeft = e.Button == System.Windows.Forms.MouseButtons.Left;
+                bool isRight = e.Button == System.Windows.Forms.MouseButtons.Right;
+
+                bool shouldTrigger = mode switch
+                {
+                    1 => isRight,           // 仅右键
+                    2 => isLeft || isRight, // 左右键
+                    _ => isLeft             // 仅左键 (默认)
+                };
+
+                if (!shouldTrigger) return;
                 _isPrimaryPointerDown = true;
                 _isTouchLikeInput = !IsCursorVisible();
 
@@ -751,12 +763,14 @@ namespace BASpark
             _globalHook.MouseUpExt += (s, e) =>
             {
                 if (!CanRenderEffects()) return;
-                if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
 
-                string inputMode = _isTouchLikeInput ? InputModeTouch : InputModeMouse;
-                ExecuteWithInputContext(inputMode, "if(window.externalUp) window.externalUp();");
-                _isPrimaryPointerDown = false;
-                _isTouchLikeInput = false;
+                if (_isPrimaryPointerDown)
+                {
+                    string inputMode = _isTouchLikeInput ? InputModeTouch : InputModeMouse;
+                    ExecuteWithInputContext(inputMode, "if(window.externalUp) window.externalUp();");
+                    _isPrimaryPointerDown = false;
+                    _isTouchLikeInput = false;
+                }
             };
         }
 
