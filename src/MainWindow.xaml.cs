@@ -265,18 +265,25 @@ namespace BASpark
         {
             try
             {
-                var options = new Microsoft.Web.WebView2.Core.CoreWebView2EnvironmentOptions(
-                    "--disable-background-timer-throttling --disable-features=CalculateNativeWinOcclusion --enable-begin-frame-scheduling"
-                );
-
-                string userDataFolder = System.IO.Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "BASpark_WebView2");
-
-                var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(null, userDataFolder, options);
+                var env = await WebView2EnvironmentHolder.GetOrCreateAsync().ConfigureAwait(true);
                 if (_isClosing) return;
 
-                await webView.EnsureCoreWebView2Async(env);
+                if (webView.CoreWebView2 == null)
+                {
+                    try
+                    {
+                        await webView.EnsureCoreWebView2Async(env).ConfigureAwait(true);
+                    }
+                    catch (ArgumentException ex) when (IsWebViewEnvironmentConflictException(ex))
+                    {
+                        AppLogger.Debug($"WebView2 environment conflict ignored: {ex.Message}");
+                        if (webView.CoreWebView2 == null)
+                        {
+                            throw;
+                        }
+                    }
+                }
+
                 if (_isClosing || !TryGetCoreWebView2(out CoreWebView2? coreWebView)) return;
 
                 _coreWebView = coreWebView;
@@ -284,8 +291,16 @@ namespace BASpark
                 coreWebView.Settings.AreDefaultContextMenusEnabled = false;
                 coreWebView.Settings.IsStatusBarEnabled = false;
 
-                _processFailedHandler = OnWebViewProcessFailed;
-                coreWebView.ProcessFailed += _processFailedHandler;
+                if (_processFailedHandler == null)
+                {
+                    _processFailedHandler = OnWebViewProcessFailed;
+                    coreWebView.ProcessFailed += _processFailedHandler;
+                }
+
+                if (_navigationCompletedHandler != null)
+                {
+                    try { coreWebView.NavigationCompleted -= _navigationCompletedHandler; } catch { /* best-effort */ }
+                }
 
                 var streamInfo = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Web/index.html"));
                 if (streamInfo != null)
@@ -314,6 +329,12 @@ namespace BASpark
             {
                 System.Windows.MessageBox.Show(Localization.Format("WebView2_InitFailed", ex.Message));
             }
+        }
+
+        private static bool IsWebViewEnvironmentConflictException(Exception ex)
+        {
+            return ex is ArgumentException &&
+                   ex.Message.Contains("CoreWebView2Environment", StringComparison.OrdinalIgnoreCase);
         }
 
         private void OnWebViewProcessFailed(object? sender, CoreWebView2ProcessFailedEventArgs e)
