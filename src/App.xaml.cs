@@ -86,8 +86,6 @@ namespace BASpark
 
             base.OnStartup(e);
 
-            bool launchedFromAutoStart = IsAutoStartLaunch(e.Args);
-
             if (!ConfigManager.AgreedToPrivacy)
             {
                 var privacyWin = new PrivacyWindow();
@@ -111,7 +109,7 @@ namespace BASpark
             Overlay = new OverlayManager();
             Overlay.Start();
 
-            if (!(launchedFromAutoStart && ConfigManager.StartSilent))
+            if (!ConfigManager.StartSilent)
             {
                 ShowControlPanel();
             }
@@ -154,11 +152,6 @@ namespace BASpark
             {
                 throw new Exception("用户拒绝了管理员授权。");
             }
-        }
-
-        private static bool IsAutoStartLaunch(string[] args)
-        {
-            return args.Any(arg => string.Equals(arg, "--autostart", StringComparison.OrdinalIgnoreCase));
         }
 
         private void OnSessionEnding(object sender, SessionEndingEventArgs e)

@@ -578,7 +578,6 @@ namespace BASpark
             ComboProfiles.SelectedItem = active;
 
             UpdateColorPreview(ConfigManager.ParticleColor);
-            UpdateStartSilentInterlock();
             UpdateClickEffectPanelVisibility();
             UpdateEnvironmentFilterInterlock();
 
@@ -769,11 +768,6 @@ namespace BASpark
             }
         }
 
-        private void CheckAutoStart_Changed(object sender, RoutedEventArgs e)
-        {
-            UpdateStartSilentInterlock();
-        }
-
         private void CheckMasterSwitch_Changed(object sender, RoutedEventArgs e)
         {
             if (!IsLoaded) return;
@@ -795,12 +789,6 @@ namespace BASpark
                 StatusText.Text = Localization.Get("Status_AdminPending");
                 StatusText.Foreground = System.Windows.Media.Brushes.Orange;
             }
-        }
-
-        private void UpdateStartSilentInterlock()
-        {
-            bool autoStartEnabled = CheckAutoStart.IsChecked == true;
-            CheckStartSilent.IsEnabled = autoStartEnabled;
         }
 
         private void EnvironmentFilterSetting_Changed(object sender, RoutedEventArgs e)
